@@ -13,6 +13,35 @@ services:
       - "8085:8085"
     depends_on:
       - placement
-    environment:
-      - DAPR_HTTP_PORT=3501
-      - DAPR_GRPC_PORT=50002
+
+  sidecar-a:
+    image: daprio/daprd:edge
+    container_name: dapr_sidecar_a
+    command: [ "./daprd",
+               "--app-id", "service-a",
+               "--app-port", "8085",
+               "--placement-host-address", "placement:50005" ]
+    depends_on:
+      - placement
+      - service-a
+    network_mode: "service:service-a"
+
+  service-b:
+    image: service-b:latest
+    container_name: dapr_service_b
+    ports:
+      - "8090:8090"
+    depends_on:
+      - placement
+
+  sidecar-b:
+    image: daprio/daprd:edge
+    container_name: dapr_sidecar_b
+    command: [ "./daprd",
+               "--app-id", "service-b",
+               "--app-port", "8090",
+               "--placement-host-address", "placement:50005" ]
+    depends_on:
+      - placement
+      - service-b
+    network_mode: "service:service-b"
