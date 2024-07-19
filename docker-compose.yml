@@ -1,0 +1,18 @@
+services:
+  placement:
+    image: daprio/dapr:latest
+    container_name: dapr_placement
+    command: [ "./placement", "--port", "50005" ]
+    ports:
+      - "50005:50005"
+
+  service-a:
+    image: service-a:latest
+    container_name: dapr_service_a
+    ports:
+      - "8085:8085"
+    depends_on:
+      - placement
+    environment:
+      - DAPR_HTTP_PORT=3501
+      - DAPR_GRPC_PORT=50002
